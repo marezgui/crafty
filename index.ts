@@ -6,7 +6,7 @@ import {
   PostMessageCommand,
   PostMessageUseCase,
 } from "./src/post-message.usecase";
-import { InMemoryMessageRepository } from "./src/InMemoryMemoryMessageRepository";
+import { FileSystemMessageRepository } from "./src/FileSystemMessageRepository";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -14,7 +14,7 @@ class RealDateProvider implements DateProvider {
   }
 }
 
-const messageRepository = new InMemoryMessageRepository();
+const messageRepository = new FileSystemMessageRepository();
 const dateProvider = new RealDateProvider();
 const postMessageCase = new PostMessageUseCase(messageRepository, dateProvider);
 const program = new Command();
@@ -26,7 +26,7 @@ program
     new Command("post")
       .argument("<user>", "the current user")
       .argument("<message>", "the message to post")
-      .action((user, message) => {
+      .action(async (user, message) => {
         const postMessageCommand: PostMessageCommand = {
           id: "some-id",
           author: user,
@@ -34,9 +34,8 @@ program
         };
 
         try {
-          postMessageCase.handle(postMessageCommand);
+          await postMessageCase.handle(postMessageCommand);
           console.log("✅ Message posté");
-          console.table([messageRepository.message]);
           process.exit(0);
         } catch (err) {
           console.error("❌", err);
