@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-
-import { Message, MessageRepository } from "./post-message.usecase";
+import { Message } from "./Message";
+import { MessageRepository } from "./MessageRepository";
 
 export class FileSystemMessageRepository implements MessageRepository {
   save(message: Message): Promise<void> {
@@ -9,5 +9,9 @@ export class FileSystemMessageRepository implements MessageRepository {
       path.join(__dirname, "message.json"),
       JSON.stringify(message)
     );
+  }
+
+  getAllUser(user: string): Promise<Message[]> {
+    return Promise.resolve([]);
   }
 }
