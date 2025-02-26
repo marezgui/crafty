@@ -1,16 +1,17 @@
 import { InMemoryMessageRepository } from "../InMemoryMemoryMessageRepository";
 import { Message } from "../Message";
+import { StubDateProvider } from "../StubDateProvider";
 import { ViewTimelineUseCase } from "../ViewTimelineUseCase";
 
 describe("Feature: Viewing a personal timeline", () => {
-  let fixture;
+  let fixture: Fixture;
 
   beforeEach(() => {
     fixture = createFixture();
   });
 
   describe("Rule: Messages are shown in DESC order", () => {
-    test("Alice can view the 2 messages she published in her timeline", async () => {
+    test("Alice can view the 3 messages she published in her timeline", async () => {
       fixture.givenTheFollowingMessageExist([
         {
           id: "message-1",
@@ -30,6 +31,12 @@ describe("Feature: Viewing a personal timeline", () => {
           text: "How are you all ?",
           publishedAt: new Date("2025-02-25T04:11:00.000Z"),
         },
+        {
+          id: "message-4",
+          author: "Alice",
+          text: "My last message",
+          publishedAt: new Date("2025-02-25T04:11:30.000Z"),
+        },
       ]);
 
       fixture.givenNowIs(new Date("2025-02-25T04:12:00.000Z"));
@@ -37,6 +44,11 @@ describe("Feature: Viewing a personal timeline", () => {
       await fixture.whenUserSeesTheTimelineOfAlice("Alice");
 
       fixture.thenUserShouldSee([
+        {
+          author: "Alice",
+          text: "My last message",
+          publicationTime: "less than a minute ago",
+        },
         {
           author: "Alice",
           text: "How are you all ?",
@@ -59,13 +71,19 @@ const createFixture = () => {
     publicationTime: string;
   }[];
   const messageRepository = new InMemoryMessageRepository();
-  const viewTimelineUseCase = new ViewTimelineUseCase(messageRepository);
+  const dateProvider = new StubDateProvider();
+  const viewTimelineUseCase = new ViewTimelineUseCase(
+    messageRepository,
+    dateProvider
+  );
 
   return {
     givenTheFollowingMessageExist(messages: Message[]) {
       messageRepository.givenExistingMessages(messages);
     },
-    givenNowIs(now: Date) {},
+    givenNowIs(now: Date) {
+      dateProvider.now = now;
+    },
     async whenUserSeesTheTimelineOfAlice(user: string) {
       timeline = await viewTimelineUseCase.handle({ user });
     },
