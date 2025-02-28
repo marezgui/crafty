@@ -17,7 +17,7 @@ export class InMemoryMessageRepository implements MessageRepository {
     messages.forEach(this._save.bind(this));
   }
 
-  getAllUser(user: string): Promise<Message[]> {
+  getMessagesByUser(user: string): Promise<Message[]> {
     return Promise.resolve(
       [...this.messages.values()].filter((msg) => msg.author === user)
     );

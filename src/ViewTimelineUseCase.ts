@@ -16,7 +16,7 @@ export class ViewTimelineUseCase {
       publicationTime: string;
     }[]
   > {
-    const messagesOfUser = await this.messageRepository.getAllUser(user);
+    const messagesOfUser = await this.messageRepository.getMessagesByUser(user);
 
     messagesOfUser.sort(
       (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()
@@ -34,7 +34,7 @@ export class ViewTimelineUseCase {
   private publicationTime = (publishedAt: Date) => {
     const now = this.dateProvider.getNow();
     const diff = now.getTime() - publishedAt.getTime();
-    const minutesAgo = diff / ONE_MINUTE_IN_MS;
+    const minutesAgo = Math.floor(diff / ONE_MINUTE_IN_MS);
 
     if (minutesAgo < 1) {
       return "less than a minute ago";

@@ -17,7 +17,7 @@ describe("Feature: Viewing a personal timeline", () => {
           id: "message-1",
           author: "Alice",
           text: "My first message",
-          publishedAt: new Date("2025-02-25T04:00:00.000Z"),
+          publishedAt: new Date("2025-02-25T03:59:59.000Z"),
         },
         {
           id: "message-2",
