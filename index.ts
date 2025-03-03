@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+
+import { FileSystemMessageRepository } from "./src/FileSystemMessageRepository";
+import { ViewTimelineUseCase } from "./src/ViewTimelineUseCase";
 import {
   DateProvider,
   PostMessageCommand,
   PostMessageUseCase,
-} from "./src/post-message.usecase";
-import { FileSystemMessageRepository } from "./src/FileSystemMessageRepository";
-import { ViewTimelineUseCase } from "./src/ViewTimelineUseCase";
+} from "./src/PostMessageUseCase";
+import {
+  EditMessageCommand,
+  EditMessageUseCase,
+} from "./src/EditMessageUseCase";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -22,6 +27,7 @@ const viewTimelineUseCase = new ViewTimelineUseCase(
   messageRepository,
   dateProvider
 );
+const editMessageUseCase = new EditMessageUseCase(messageRepository);
 const program = new Command();
 
 program
@@ -58,6 +64,26 @@ program
           process.exit(0);
         } catch (e) {
           console.error(e);
+          process.exit(1);
+        }
+      })
+  )
+  .addCommand(
+    new Command("edit")
+      .argument("<message>", "the message id of the message to edit")
+      .argument("<new message>", "the new message")
+      .action(async (messageId, message) => {
+        const editMessageCommand: EditMessageCommand = {
+          messageId,
+          text: message,
+        };
+
+        try {
+          await editMessageUseCase.handle(editMessageCommand);
+          console.log("✅ Message edité");
+          process.exit(0);
+        } catch (err) {
+          console.error("❌", err);
           process.exit(1);
         }
       })

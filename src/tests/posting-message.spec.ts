@@ -1,7 +1,4 @@
-import {
-  EmptyMessageError,
-  MessageTooLongError,
-} from "../post-message.usecase";
+import { EmptyMessageError, MessageTooLongError } from "../PostMessageUseCase";
 import { createMessageFixture, MessagingFixture } from "./createMessageFixture";
 import { messageBuilder } from "./MessageBuilder";
 
@@ -22,7 +19,7 @@ describe("Feature : Posting a message", () => {
         author: "Alice",
       });
 
-      fixture.thenMessageShouldBe(
+      await fixture.thenMessageShouldBe(
         messageBuilder()
           .withId("message-id")
           .withAuthor("Alice")

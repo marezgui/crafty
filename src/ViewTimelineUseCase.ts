@@ -1,5 +1,5 @@
 import { MessageRepository } from "./MessageRepository";
-import { DateProvider } from "./post-message.usecase";
+import { DateProvider } from "./PostMessageUseCase";
 
 const ONE_MINUTE_IN_MS = 60000;
 

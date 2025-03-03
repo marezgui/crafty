@@ -1,37 +1,39 @@
-import { InMemoryMessageRepository } from "../InMemoryMemoryMessageRepository";
+import { EditMessageCommand, EditMessageUseCase } from "../EditMessageUseCase";
+import { InMemoryMessageRepository } from "../InMemoryMessageRepository";
 import { Message } from "../Message";
-import {
-  PostMessageUseCase,
-  PostMessageCommand,
-} from "../post-message.usecase";
+import { PostMessageUseCase, PostMessageCommand } from "../PostMessageUseCase";
 import { StubDateProvider } from "../StubDateProvider";
 import { ViewTimelineUseCase } from "../ViewTimelineUseCase";
 
 export const createMessageFixture = () => {
   const dateProvider = new StubDateProvider();
   const messageRepository = new InMemoryMessageRepository();
-  const postMessageUseCase = new PostMessageUseCase(
-    messageRepository,
-    dateProvider
-  );
   let thrownError: Error;
-  const viewTimelineUseCase = new ViewTimelineUseCase(
-    messageRepository,
-    dateProvider
-  );
   let timeline: {
     author: string;
     text: string;
     publicationTime: string;
   }[];
 
+  const postMessageUseCase = new PostMessageUseCase(
+    messageRepository,
+    dateProvider
+  );
+  const editMessageUseCase = new EditMessageUseCase(messageRepository);
+  const viewTimelineUseCase = new ViewTimelineUseCase(
+    messageRepository,
+    dateProvider
+  );
+
   return {
+    // GIVEN
     givenNowIs(now: Date) {
       dateProvider.now = now;
     },
     givenTheFollowingMessageExist(messages: Message[]) {
       messageRepository.givenExistingMessages(messages);
     },
+    // WHEN
     async whenUserPostAmessage(postMessageCommand: PostMessageCommand) {
       try {
         await postMessageUseCase.handle(postMessageCommand);
@@ -39,10 +41,21 @@ export const createMessageFixture = () => {
         thrownError = err;
       }
     },
-    thenMessageShouldBe(expectedMessage: Message) {
-      expect(expectedMessage).toEqual(
-        messageRepository.getMessageById(expectedMessage.id)
-      );
+    async whenUserEditMessage(editMessageCommand: EditMessageCommand) {
+      try {
+        await editMessageUseCase.handle(editMessageCommand);
+      } catch (err) {
+        thrownError = err;
+      }
+    },
+    async whenUserSeesTheTimelineOfAlice(user: string) {
+      timeline = await viewTimelineUseCase.handle({ user });
+    },
+    // THEN
+    async thenMessageShouldBe(expectedMessage: Message) {
+      console.log("🚀", { expectedMessage, messageRepository });
+      const message = await messageRepository.getById(expectedMessage.id);
+      expect(message).toEqual(expectedMessage);
     },
     thenErrorShouldbe(expectedErrorClass: new () => Error) {
       expect(thrownError).toBeInstanceOf(expectedErrorClass);
@@ -56,13 +69,6 @@ export const createMessageFixture = () => {
     ) {
       expect(timeline).toEqual(expectedTimeline);
     },
-    async whenUserSeesTheTimelineOfAlice(user: string) {
-      timeline = await viewTimelineUseCase.handle({ user });
-    },
-    async whenUserEditMessage(editMessageCommand: {
-      messageId: string;
-      text: string;
-    }) {},
   };
 };
 

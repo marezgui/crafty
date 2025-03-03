@@ -35,7 +35,10 @@ export const messageBuilder = ({
     },
     build(): Message {
       return {
-        ...props,
+        id: props.id,
+        author: props.author,
+        text: props.text,
+        publishedAt: props.publishedAt,
       };
     },
   };
