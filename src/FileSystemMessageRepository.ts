@@ -1,10 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Message } from "./Message";
+import { Message, MessageText } from "./Message";
 import { MessageRepository } from "./MessageRepository";
 
 export class FileSystemMessageRepository implements MessageRepository {
-  private readonly messagePath = path.join(__dirname, "message.json");
+  constructor(
+    private readonly messagePath = path.join(__dirname, "message.json")
+  ) {}
 
   async save(message: Message): Promise<void> {
     const messages = await this.getMessages();
@@ -19,8 +21,15 @@ export class FileSystemMessageRepository implements MessageRepository {
     }
 
     return fs.promises.writeFile(
-      path.join(__dirname, "message.json"),
-      JSON.stringify(messages)
+      this.messagePath,
+      JSON.stringify(
+        messages.map((m) => ({
+          id: m.id,
+          author: m.author,
+          text: m.text.value,
+          publishedAt: m.publishedAt,
+        }))
+      )
     );
   }
 
@@ -38,17 +47,12 @@ export class FileSystemMessageRepository implements MessageRepository {
 
   private async getMessages(): Promise<Message[]> {
     const data = await fs.promises.readFile(this.messagePath);
-    const messages = JSON.parse(data.toString()) as {
-      id: string;
-      author: string;
-      text: string;
-      publishedAt: string;
-    }[];
+    const messages = JSON.parse(data.toString());
 
     return messages.map((m) => ({
       id: m.id,
       author: m.author,
-      text: m.text,
+      text: MessageText.of(m.text),
       publishedAt: new Date(m.publishedAt),
     }));
   }
