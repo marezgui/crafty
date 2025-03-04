@@ -2,23 +2,17 @@
 
 import { Command } from "commander";
 
-import { FileSystemMessageRepository } from "./src/FileSystemMessageRepository";
-import { ViewTimelineUseCase } from "./src/ViewTimelineUseCase";
+import { FileSystemMessageRepository } from "./src/infra/FileSystemMessageRepository";
+import { ViewTimelineUseCase } from "./src/application/usecases/ViewTimelineUseCase";
 import {
-  DateProvider,
   PostMessageCommand,
   PostMessageUseCase,
-} from "./src/PostMessageUseCase";
+} from "./src/application/usecases/PostMessageUseCase";
 import {
   EditMessageCommand,
   EditMessageUseCase,
-} from "./src/EditMessageUseCase";
-
-class RealDateProvider implements DateProvider {
-  getNow(): Date {
-    return new Date();
-  }
-}
+} from "./src/application/usecases/EditMessageUseCase";
+import { RealDateProvider } from "./src/infra/RealDateProvider";
 
 const messageRepository = new FileSystemMessageRepository();
 const dateProvider = new RealDateProvider();

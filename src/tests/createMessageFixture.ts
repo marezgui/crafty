@@ -1,9 +1,15 @@
-import { EditMessageCommand, EditMessageUseCase } from "../EditMessageUseCase";
-import { InMemoryMessageRepository } from "../InMemoryMessageRepository";
-import { Message } from "../Message";
-import { PostMessageUseCase, PostMessageCommand } from "../PostMessageUseCase";
-import { StubDateProvider } from "../StubDateProvider";
-import { ViewTimelineUseCase } from "../ViewTimelineUseCase";
+import {
+  PostMessageUseCase,
+  PostMessageCommand,
+} from "../application/usecases/PostMessageUseCase";
+import { ViewTimelineUseCase } from "../application/usecases/ViewTimelineUseCase";
+import { Message } from "../domain/Message";
+import { InMemoryMessageRepository } from "../infra/InMemoryMessageRepository";
+import { StubDateProvider } from "../infra/StubDateProvider";
+import {
+  EditMessageCommand,
+  EditMessageUseCase,
+} from "../application/usecases/EditMessageUseCase";
 
 export const createMessageFixture = () => {
   const dateProvider = new StubDateProvider();

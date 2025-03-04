@@ -1,5 +1,5 @@
-import { MessageRepository } from "./MessageRepository";
-import { DateProvider } from "./PostMessageUseCase";
+import { DateProvider } from "../DateProvider";
+import { MessageRepository } from "../MessageRepository";
 
 const ONE_MINUTE_IN_MS = 60000;
 
@@ -22,13 +22,11 @@ export class ViewTimelineUseCase {
       (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()
     );
 
-    return messagesOfUser.map((message) => {
-      return {
-        author: message.author,
-        text: message.text.value,
-        publicationTime: this.publicationTime(message.publishedAt),
-      };
-    });
+    return messagesOfUser.map((message) => ({
+      author: message.author,
+      text: message.text,
+      publicationTime: this.publicationTime(message.publishedAt),
+    }));
   }
 
   private publicationTime = (publishedAt: Date) => {

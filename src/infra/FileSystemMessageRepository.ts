@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Message, MessageText } from "./Message";
-import { MessageRepository } from "./MessageRepository";
+import { MessageRepository } from "../application/MessageRepository";
+import { Message } from "../domain/Message";
 
 export class FileSystemMessageRepository implements MessageRepository {
   constructor(
@@ -22,14 +22,7 @@ export class FileSystemMessageRepository implements MessageRepository {
 
     return fs.promises.writeFile(
       this.messagePath,
-      JSON.stringify(
-        messages.map((m) => ({
-          id: m.id,
-          author: m.author,
-          text: m.text.value,
-          publishedAt: m.publishedAt,
-        }))
-      )
+      JSON.stringify(messages.map((m) => m.data))
     );
   }
 
@@ -49,11 +42,13 @@ export class FileSystemMessageRepository implements MessageRepository {
     const data = await fs.promises.readFile(this.messagePath);
     const messages = JSON.parse(data.toString());
 
-    return messages.map((m) => ({
-      id: m.id,
-      author: m.author,
-      text: MessageText.of(m.text),
-      publishedAt: new Date(m.publishedAt),
-    }));
+    return messages.map((m) =>
+      Message.fromData({
+        id: m.id,
+        author: m.author,
+        text: m.text,
+        publishedAt: new Date(m.publishedAt),
+      })
+    );
   }
 }
