@@ -1,12 +1,15 @@
 import { EmptyMessageError, MessageTooLongError } from "../domain/Message";
-import { createMessageFixture, MessagingFixture } from "./createMessageFixture";
+import {
+  createMessagingFixture,
+  MessagingFixture,
+} from "./createMessageFixture";
 import { messageBuilder } from "./MessageBuilder";
 
 describe("Feature : Posting a message", () => {
   let fixture: MessagingFixture;
 
   beforeEach(() => {
-    fixture = createMessageFixture();
+    fixture = createMessagingFixture();
   });
 
   describe("Rule : A message can contain a maximun of 280 characters", () => {

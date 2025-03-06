@@ -11,7 +11,7 @@ import {
   EditMessageUseCase,
 } from "../application/usecases/EditMessageUseCase";
 
-export const createMessageFixture = () => {
+export const createMessagingFixture = () => {
   const dateProvider = new StubDateProvider();
   const messageRepository = new InMemoryMessageRepository();
   let thrownError: Error;
@@ -59,7 +59,6 @@ export const createMessageFixture = () => {
     },
     // THEN
     async thenMessageShouldBe(expectedMessage: Message) {
-      console.log("🚀", { expectedMessage, messageRepository });
       const message = await messageRepository.getById(expectedMessage.id);
       expect(message).toEqual(expectedMessage);
     },
@@ -75,7 +74,8 @@ export const createMessageFixture = () => {
     ) {
       expect(timeline).toEqual(expectedTimeline);
     },
+    messageRepository,
   };
 };
 
-export type MessagingFixture = ReturnType<typeof createMessageFixture>;
+export type MessagingFixture = ReturnType<typeof createMessagingFixture>;

@@ -1,12 +1,15 @@
 import { MessageTooLongError, EmptyMessageError } from "../domain/Message";
-import { MessagingFixture, createMessageFixture } from "./createMessageFixture";
+import {
+  createMessagingFixture,
+  MessagingFixture,
+} from "./createMessageFixture";
 import { messageBuilder } from "./MessageBuilder";
 
 describe("Feature : Editing a message", () => {
   let fixture: MessagingFixture;
 
   beforeEach(() => {
-    fixture = createMessageFixture();
+    fixture = createMessagingFixture();
   });
 
   describe("Rule : The edited text should not be superior to 200 characters", () => {

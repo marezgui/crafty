@@ -1,11 +1,14 @@
-import { createMessageFixture, MessagingFixture } from "./createMessageFixture";
+import {
+  createMessagingFixture,
+  MessagingFixture,
+} from "./createMessageFixture";
 import { messageBuilder } from "./MessageBuilder";
 
 describe("Feature: Viewing a personal timeline", () => {
   let fixture: MessagingFixture;
 
   beforeEach(() => {
-    fixture = createMessageFixture();
+    fixture = createMessagingFixture();
   });
 
   describe("Rule: Messages are shown in DESC order", () => {
