@@ -22,7 +22,6 @@ describe("PrismaMessageRepository", () => {
       .withExposedPorts(5432)
       .start();
     const databaseUrl = container.getConnectionUri();
-    console.log("🚀", { databaseUrl });
 
     prismaClient = new PrismaClient({
       datasources: {
