@@ -2,26 +2,28 @@
 
 import { Command } from "commander";
 
-import { FileSystemMessageRepository } from "./src/infra/FileSystemMessageRepository";
-import { ViewTimelineUseCase } from "./src/application/usecases/ViewTimelineUseCase";
+import { PrismaClient } from "@prisma/client";
 import {
-  PostMessageCommand,
-  PostMessageUseCase,
-} from "./src/application/usecases/PostMessageUseCase";
-import {
-  EditMessageCommand,
   EditMessageUseCase,
-} from "./src/application/usecases/EditMessageUseCase";
-import { ViewWallUseCase } from "./src/application/usecases/ViewWallUseCase";
-import { RealDateProvider } from "./src/infra/RealDateProvider";
+  EditMessageCommand,
+} from "../application/usecases/EditMessageUseCase";
 import {
-  FollowUserCommand,
   FollowUserUseCase,
-} from "./src/application/usecases/FollowUserUseCase";
-import { FileSystemFolloweeRepository } from "./src/infra/FileSystemFolloweeRepository";
+  FollowUserCommand,
+} from "../application/usecases/FollowUserUseCase";
+import {
+  PostMessageUseCase,
+  PostMessageCommand,
+} from "../application/usecases/PostMessageUseCase";
+import { ViewTimelineUseCase } from "../application/usecases/ViewTimelineUseCase";
+import { ViewWallUseCase } from "../application/usecases/ViewWallUseCase";
+import { RealDateProvider } from "../infra/RealDateProvider";
+import { PrismaFolloweeRepository } from "../infra/PrismaFolloweeRepository";
+import { PrismaMessageRepository } from "../infra/PrismaMessageRepository";
 
-const messageRepository = new FileSystemMessageRepository();
-const followUserRepository = new FileSystemFolloweeRepository();
+const prismaClient = new PrismaClient();
+const messageRepository = new PrismaMessageRepository(prismaClient);
+const followUserRepository = new PrismaFolloweeRepository(prismaClient);
 const dateProvider = new RealDateProvider();
 
 const postMessageCase = new PostMessageUseCase(messageRepository, dateProvider);
@@ -133,7 +135,9 @@ program
   );
 
 async function main() {
+  await prismaClient.$connect();
   await program.parseAsync();
+  await prismaClient.$disconnect();
 }
 
 main();
