@@ -1,4 +1,6 @@
+import { EmptyMessageError, MessageTooLongError } from "../../domain/Message";
 import { MessageRepository } from "../MessageRepository";
+import { Err, Ok, Result } from "../Result";
 
 export type EditMessageCommand = {
   messageId: string;
@@ -8,13 +10,21 @@ export type EditMessageCommand = {
 export class EditMessageUseCase {
   constructor(private readonly messageRepository: MessageRepository) {}
 
-  async handle(editMessageCommand: EditMessageCommand) {
+  async handle(
+    editMessageCommand: EditMessageCommand
+  ): Promise<Result<void, EmptyMessageError | MessageTooLongError>> {
     const message = await this.messageRepository.getById(
       editMessageCommand.messageId
     );
 
-    message.editText(editMessageCommand.text);
+    try {
+      message.editText(editMessageCommand.text);
+    } catch (err) {
+      return Err.of(err);
+    }
 
     await this.messageRepository.save(message);
+
+    return Ok.of(undefined);
   }
 }

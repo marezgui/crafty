@@ -70,9 +70,14 @@ program
         };
 
         try {
-          await postMessageCase.handle(postMessageCommand);
-          console.log("✅ Message posté");
-          process.exit(0);
+          const result = await postMessageCase.handle(postMessageCommand);
+          if (result.isOk()) {
+            console.log("✅ Message posté");
+            process.exit(0);
+          } else {
+            console.error("❌", result.error);
+            process.exit(1);
+          }
         } catch (err) {
           console.error("❌", err);
           process.exit(1);
@@ -107,9 +112,14 @@ program
         };
 
         try {
-          await editMessageUseCase.handle(editMessageCommand);
-          console.log("✅ Message edité");
-          process.exit(0);
+          const result = await editMessageUseCase.handle(editMessageCommand);
+          if (result.isOk()) {
+            console.log("✅ Message edité");
+            process.exit(0);
+          } else {
+            console.error("❌", result.error);
+            process.exit(1);
+          }
         } catch (err) {
           console.error("❌", err);
           process.exit(1);

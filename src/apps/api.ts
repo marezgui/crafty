@@ -60,8 +60,14 @@ const routes = async (fastifyInstance: FastifyInstance) => {
       };
 
       try {
-        await postMessageCase.handle(postMessageCommand);
-        res.status(201);
+        const result = await postMessageCase.handle(postMessageCommand);
+
+        if (result.isOk()) {
+          res.status(201);
+          return;
+        } else {
+          res.send(httpErrors[403](result.error));
+        }
       } catch (err) {
         res.send(httpErrors[500](err));
       }
@@ -77,8 +83,14 @@ const routes = async (fastifyInstance: FastifyInstance) => {
     };
 
     try {
-      await editMessageUseCase.handle(editMessageCommand);
-      res.status(201);
+      const result = await editMessageUseCase.handle(editMessageCommand);
+
+      if (result.isOk()) {
+        res.status(200);
+        return;
+      } else {
+        res.send(httpErrors[403](result.error));
+      }
     } catch (err) {
       res.send(httpErrors[500](err));
     }

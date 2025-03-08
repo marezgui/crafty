@@ -49,17 +49,17 @@ export const createMessagingFixture = () => {
     },
     // WHEN
     async whenUserPostAmessage(postMessageCommand: PostMessageCommand) {
-      try {
-        await postMessageUseCase.handle(postMessageCommand);
-      } catch (err) {
-        thrownError = err;
+      const result = await postMessageUseCase.handle(postMessageCommand);
+
+      if (result.isErr()) {
+        thrownError = result.error;
       }
     },
     async whenUserEditMessage(editMessageCommand: EditMessageCommand) {
-      try {
-        await editMessageUseCase.handle(editMessageCommand);
-      } catch (err) {
-        thrownError = err;
+      const result = await editMessageUseCase.handle(editMessageCommand);
+
+      if (result.isErr()) {
+        thrownError = result.error;
       }
     },
     async whenUserSeesTheTimelineOfAlice(user: string) {
