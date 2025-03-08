@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from "fastify";
+import Fastify, { FastifyInstance, FastifyReply } from "fastify";
 import * as httpErrors from "http-errors";
 import { PrismaClient } from "@prisma/client";
 import {
@@ -18,6 +18,16 @@ import { ViewWallUseCase } from "../application/usecases/ViewWallUseCase";
 import { RealDateProvider } from "../infra/RealDateProvider";
 import { PrismaFolloweeRepository } from "../infra/PrismaFolloweeRepository";
 import { PrismaMessageRepository } from "../infra/PrismaMessageRepository";
+import { TimelinePresenter } from "../application/TimelinePresenter";
+import { Timeline } from "../domain/Timeline";
+
+class ApiTimelinePresenter implements TimelinePresenter {
+  constructor(private readonly res: FastifyReply) {}
+
+  show(timeline: Timeline): void {
+    this.res.status(200).send(timeline.data);
+  }
+}
 
 const prismaClient = new PrismaClient();
 const messageRepository = new PrismaMessageRepository(prismaClient);
@@ -33,8 +43,7 @@ const editMessageUseCase = new EditMessageUseCase(messageRepository);
 const followUserUseCase = new FollowUserUseCase(followUserRepository);
 const viewWallUseCase = new ViewWallUseCase(
   messageRepository,
-  followUserRepository,
-  dateProvider
+  followUserRepository
 );
 
 const fastify = Fastify({ logger: true });
@@ -94,11 +103,15 @@ const routes = async (fastifyInstance: FastifyInstance) => {
   fastifyInstance.get<{
     Querystring: { user: string };
   }>("/view", {}, async (req, res) => {
+    const timelinePresenter = new ApiTimelinePresenter(res);
+
     try {
-      const timeline = await viewTimelineUseCase.handle({
-        user: req.query.user,
-      });
-      res.status(200).send(timeline);
+      await viewTimelineUseCase.handle(
+        {
+          user: req.query.user,
+        },
+        timelinePresenter
+      );
     } catch (err) {
       res.send(httpErrors[500](err));
     }
@@ -107,9 +120,10 @@ const routes = async (fastifyInstance: FastifyInstance) => {
   fastifyInstance.get<{
     Body: { user: string };
   }>("/wall", {}, async (req, res) => {
+    const timelinePresenter = new ApiTimelinePresenter(res);
+
     try {
-      const wall = await viewWallUseCase.handle({ user: req.body.user });
-      res.status(200).send(wall);
+      await viewWallUseCase.handle({ user: req.body.user }, timelinePresenter);
     } catch (err) {
       res.send(httpErrors[500](err));
     }

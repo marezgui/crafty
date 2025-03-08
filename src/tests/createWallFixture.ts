@@ -1,4 +1,6 @@
+import { TimelinePresenter } from "../application/TimelinePresenter";
 import { ViewWallUseCase } from "../application/usecases/ViewWallUseCase";
+import { DefaultTimelinePresenter } from "../apps/DefaultTimelinePresenter";
 import { StubDateProvider } from "../infra/StubDateProvider";
 
 export const createWallFixture = ({
@@ -13,16 +15,21 @@ export const createWallFixture = ({
   }[];
   const viewWallUseCase = new ViewWallUseCase(
     messageRepository,
-    followeeRepository,
-    dateProvider
+    followeeRepository
   );
+  const defaultWallPresenter = new DefaultTimelinePresenter(dateProvider);
+  const wallPresenter: TimelinePresenter = {
+    show(theTimeline) {
+      wall = defaultWallPresenter.show(theTimeline);
+    },
+  };
 
   return {
     givenNowIs(now: Date) {
       dateProvider.now = now;
     },
     async whenUserSeesTheWallOf(user: string) {
-      wall = await viewWallUseCase.handle({ user });
+      await viewWallUseCase.handle({ user }, wallPresenter);
     },
     thenUserShouldSee(
       expectedWall: {
