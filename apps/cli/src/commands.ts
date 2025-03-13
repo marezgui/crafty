@@ -59,10 +59,11 @@ export class ViewCommand extends CommandRunner {
         { user },
         this.cliPresenter,
       );
+
       console.table(timeline);
       process.exit(0);
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
       process.exit(1);
     }
   }

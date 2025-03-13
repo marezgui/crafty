@@ -10,6 +10,6 @@ export class CliTimelinePresenter implements TimelinePresenter {
   ) {}
 
   show(timeline: Timeline): void {
-    console.table(this.defaultTimelinePresenter.show(timeline));
+    this.logger.table(this.defaultTimelinePresenter.show(timeline));
   }
 }

@@ -33,6 +33,7 @@ export class PrismaMessageRepository implements MessageRepository {
       },
     });
   }
+
   async getById(messageId: string): Promise<Message> {
     const messageData = await this.prisma.message.findFirstOrThrow({
       where: { id: messageId },
